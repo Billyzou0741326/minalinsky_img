@@ -1,0 +1,3 @@
+images/
+*.c
+!main.c
