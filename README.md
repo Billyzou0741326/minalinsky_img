@@ -4,8 +4,8 @@ An image crawler to collect images from [here](https://www.reddit.com/r/Legendar
 
 ## Requirements
 
-* [https://github.com/json-c/json-c](json-c >= 0.14)
-* [https://github.com/curl/curl](curl >= 7.62)
+* [json-c >= 0.14](https://github.com/json-c/json-c)
+* [curl >= 7.62](https://github.com/curl/curl)
 
 
 ## Docker
