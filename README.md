@@ -16,7 +16,7 @@ An image crawler to collect images from [here](https://www.reddit.com/r/Legendar
 
 ### Create container
 
-`docker create --name=Minalinsky -u $(whoami) -v ${PWD}/images:/app/images -it minalinsky:latest`
+`docker create --name=Minalinsky -u $(stat -c "%u:%g" $(pwd)/images) -v ${PWD}/images:/app/images -it minalinsky:latest`
 
 ### Run container
 

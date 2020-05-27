@@ -97,7 +97,7 @@ main(int argc, char *argv[]) {
         printf("http status (%ld)\n", status_code);
 
         /** Parse Postids from json */
-        // printf("%s\n", json_object_to_json_string(json_data.json));
+        // printf("%s\n", json_object_to_json_string_ext(json_data.json, JSON_C_TO_STRING_PRETTY));
 
         struct array_list *postIdList = NULL;
         json_object *posts = NULL, *data = NULL, *json = NULL;
@@ -122,7 +122,6 @@ main(int argc, char *argv[]) {
         for (size_t i = 0; i < max; ++i) {
             size_t index = max - i - 1;
             const char *postid = json_object_get_string(array_list_get_idx(postIdList, index));
-            printf("%s\n", postid);
 
             if (0 == i && postid) {
                 if (!strcmp(after_postid, postid)) {
@@ -133,16 +132,18 @@ main(int argc, char *argv[]) {
                 printf("Last postid: (%s/%s)\n", after_postid, postid);
             }
 
-            json_object *content, *type, *external_1, *external_2;
+            json_object *content, *type, *external_1, *external_2, *external_3;
             json_object_object_get_ex(posts, postid, &data);                /** .posts.<postid> */
             json_object_object_get_ex(data, "callToAction", &external_1);   /** .posts.<postid>.callToAction */
             json_object_object_get_ex(data, "domainOverride", &external_2); /** .posts.<postid>.domainOverride */
+            json_object_object_get_ex(data, "isSponsored", &external_3);    /** .posts.<postid>.isSponsored */
             json_object_object_get_ex(data, "media", &data);                /** .posts.<postid>.media */
             json_object_object_get_ex(data, "content", &content);           /** .posts.<postid>.media.content */
             json_object_object_get_ex(data, "type", &type);                 /** .posts.<postid>.media.type */
             const char *file_type = json_object_get_string(type);
             const char *url = json_object_get_string(content);
-            if (!external_1 && !external_2 && file_type && !strcmp(file_type, "image") && url) {
+            int is_sponsored = json_object_get_boolean(external_3);
+            if (!external_1 && !external_2 && !is_sponsored && file_type && !strcmp(file_type, "image") && url) {
                 CURLUcode url_code;
                 CURLU *url_info = curl_url();
                 url_code = curl_url_set(url_info, CURLUPART_URL, url, 0L);
@@ -151,6 +152,7 @@ main(int argc, char *argv[]) {
                     url_node->url = url_info;
                     url_node->next = urls;
                     urls = url_node;
+                    printf("%s  =>  %s\n", postid, url);
                 } else {
                     curl_url_cleanup(url_info);
                 }
