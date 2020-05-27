@@ -10,4 +10,7 @@ RUN make
 FROM alpine:3.11 AS final
 WORKDIR /app/
 ENTRYPOINT ["./main"]
+RUN apk add --no-cache \
+    curl-dev \
+    json-c-dev
 COPY --from=build /app/main /app/main

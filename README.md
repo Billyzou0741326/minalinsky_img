@@ -12,11 +12,11 @@ An image crawler to collect images from [here](https://www.reddit.com/r/Legendar
 
 ### Build image
 
-`docker build -t Minalinsky:latest .`
+`DOCKER_BUILDKIT=1 docker build -t minalinsky:latest .`
 
 ### Create container
 
-`docker create --name=Minalinsky -v ${PWD}/images:/app/images -it Minalinsky:latest`
+`docker create --name=Minalinsky -u $(whoami) -v ${PWD}/images:/app/images -it minalinsky:latest`
 
 ### Run container
 
