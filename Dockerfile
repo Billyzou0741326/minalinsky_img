@@ -1,9 +1,13 @@
-FROM alpine:3.11
-COPY . /app/
+FROM alpine:3.11 AS build
+RUN apk add --no-cache \
+    build-base \
+    curl-dev \
+    json-c-dev
 WORKDIR /app/
-RUN apk add --no-cache build-base && \
-    apk add --no-cache curl-dev && \
-    apk add --no-cache json-c-dev && \
-    make && \
-    apk del build-base
+COPY Makefile main.c /app/
+RUN make
+
+FROM alpine:3.11 AS final
+WORKDIR /app/
 ENTRYPOINT ["./main"]
+COPY --from=build /app/main /app/main
