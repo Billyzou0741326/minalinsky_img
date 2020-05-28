@@ -12,6 +12,7 @@
 
 const char *const api = "https://gateway.reddit.com/desktopapi/v1/subreddits/LegendaryMinalinsky?rtj=only&redditWebClient=web2x&app=web2x-client-production&allow_over18=&include=prefsSubreddit&dist=7&layout=card&sort=hot&geo_filter=US";
 const char *const user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:76.0) Gecko/20100101 Firefox/76.0";
+const int CONCURRENT_DOWNLOADS = 50;
 
 struct json_parser {
     json_tokener *tok;
@@ -177,9 +178,8 @@ main(int argc, char *argv[]) {
     CURLM *multi_curl = curl_multi_init();
     int running = 0;
     int total = 0;
-    const int THRESHOLD = 50;
     for (int done = 0; !done;) {
-        for (struct urls *current = urls, *previous; current && running < THRESHOLD; ++total) {
+        for (struct urls *current = urls, *previous; current && running < CONCURRENT_DOWNLOADS; ++total) {
             previous = current;
 
             char *path_name = NULL;
@@ -324,32 +324,39 @@ main(int argc, char *argv[]) {
             usleep(1000 * 5);
             curl_multi_perform(multi_curl, &running);
             m = curl_multi_info_read(multi_curl, &x);
-            if (m && m->msg == CURLMSG_DONE && m->easy_handle) {
-                struct requests *req;
+            if (m) {
+                struct requests *req = NULL;
+                struct file_parser *f = NULL;
+                long status_code = 0;
                 CURL *e = m->easy_handle;
-                curl_easy_getinfo(e, CURLINFO_PRIVATE, &req);
 
-                if (req && req->user_p) {
-                    struct file_parser *f = req->user_p;
+                if (m->msg == CURLMSG_DONE) {
+                    curl_easy_getinfo(e, CURLINFO_PRIVATE, &req);
+                    curl_easy_getinfo(e, CURLINFO_RESPONSE_CODE, &status_code);
+                    f = req ? req->user_p : NULL;
                     if (f) {
                         printf("(%d) done\n", f->fd);
                         if (f->fd > 0 && !f->closed)
                             close(f->fd);
+                        if ((m->data.result != CURLE_OK) || (status_code != 200)) {
+                            remove(f->filename);
+                            fprintf(stderr, "http status code (%ld); curl return code (%d)\n",
+                                    status_code, m->data.result);
+                        }
                         f->closed = 1;
                         free(f->filename);
                         free(f);
                     }
-                    if (req->url_info)
-                        curl_url_cleanup(req->url_info);
-                    if (req->easy_curl)
-                        curl_easy_cleanup(req->easy_curl);
-                    req->user_p = NULL;
-                    req->easy_curl = NULL;
-                    req->url_info = NULL;
+                    if (req) {
+                        if (req->url_info)
+                            curl_url_cleanup(req->url_info);
+                        if (req->easy_curl)
+                            curl_easy_cleanup(req->easy_curl);
+                        req->user_p = NULL;
+                        req->easy_curl = NULL;
+                        req->url_info = NULL;
+                    }
                 }
-            }
-            if (m && m->msg != CURLMSG_DONE) {
-                fprintf(stderr, "CURLMsg (%d)\n", m->msg);
             }
         }
     }

@@ -1,2 +1,7 @@
-*.c
+*
+!.dockerignore
+!images
+!Dockerfile
+!README.md
+!Makefile
 !main.c
