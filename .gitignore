@@ -3,6 +3,7 @@
 !README.md
 
 !.gitignore
+!.gitattributes
 
 !.dockerignore
 !Dockerfile
@@ -10,12 +11,16 @@
 !Makefile.in
 !Makefile.am
 !configure
-!install-sh
+!configure.ac
 !config.h.in
+!compile
+!depcomp
+!install-sh
+!missing
 
 !src/
 !src/*
 
 !images/
 
-*.swp
+**/*.swp

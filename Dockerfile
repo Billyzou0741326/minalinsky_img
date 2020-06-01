@@ -5,7 +5,16 @@ RUN apk add --no-cache \
     autoconf \
     curl-dev \
     json-c-dev
-COPY configure.ac Makefile.am /app/
+COPY configure \
+    configure.ac \
+    config.h.in \
+    compile \
+    depcomp \
+    missing \
+    install-sh \
+    Makefile.am \
+    Makefile.in \
+    /app/
 COPY src/ /app/src/
 WORKDIR /app/
 RUN mkdir build/ && cd build/ \
