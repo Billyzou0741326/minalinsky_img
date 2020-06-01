@@ -4,8 +4,20 @@ An image crawler to collect images from [here](https://www.reddit.com/r/Legendar
 
 ## Requirements
 
+* Linux OS
 * [json-c >= 0.14](https://github.com/json-c/json-c)
 * [curl >= 7.62](https://github.com/curl/curl)
+
+
+## Build
+
+1. `mkdir build`
+2. `cd build`
+3. `../configure --prefix=<path>`
+4. `make`
+5. `make install`
+6. `cd ../`
+7. `rm -r build/`
 
 
 ## Docker

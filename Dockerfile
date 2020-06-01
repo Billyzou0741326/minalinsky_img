@@ -1,16 +1,21 @@
 FROM alpine:3.11 AS build
 RUN apk add --no-cache \
     build-base \
+    automake \
+    autoconf \
     curl-dev \
     json-c-dev
+COPY configure.ac Makefile.am /app/
+COPY src/ /app/src/
 WORKDIR /app/
-COPY Makefile main.c /app/
-RUN make
+RUN mkdir build/ && cd build/ \
+    && ../configure --prefix=/app \
+    && make && make install
 
 FROM alpine:3.11 AS final
-WORKDIR /app/
-ENTRYPOINT ["./main"]
 RUN apk add --no-cache \
     curl-dev \
     json-c-dev
-COPY --from=build /app/main /app/main
+WORKDIR /app/
+ENTRYPOINT ["./main"]
+COPY --from=build /app/bin/main /app/
