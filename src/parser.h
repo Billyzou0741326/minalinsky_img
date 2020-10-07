@@ -5,9 +5,9 @@
 #include "str.h"
 
 struct json_parser {
-    json_tokener *tok;
-    json_object *json;
-    enum json_tokener_error jerr;
+  json_tokener *tok;
+  json_object *json;
+  enum json_tokener_error jerr;
 };
 
 struct json_parser* json_parser_create(void);

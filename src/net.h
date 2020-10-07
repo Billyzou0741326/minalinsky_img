@@ -5,34 +5,34 @@
 #include "parser.h"
 
 struct net_global {
-    int epollfd;
-    int timerfd;
-    int running;
-    CURLM *multi_curl;
-    CURLSH *share_curl;
+  int epollfd;
+  int timerfd;
+  int running;
+  CURLM *multi_curl;
+  CURLSH *share_curl;
 };
 
 /** Created before net_socket, holds parsing method and data received */
 struct net_conn {
-    enum conn_type {
-        NET_HTTP,
-    } type;
-    CURL *easy_curl;
-    CURLU *url;
-    struct net_global *n_global;
-    void *on_done_data;
-    void (*on_done_data_free)(void *on_done_data);
-    void (*on_done_callback)(CURL *easy_curl, CURLcode code, void *on_done_data);
-    char error[CURL_ERROR_SIZE+1];
+  enum conn_type {
+    NET_HTTP,
+  } type;
+  CURL *easy_curl;
+  CURLU *url;
+  struct net_global *n_global;
+  void *on_done_data;
+  void (*on_done_data_free)(void *on_done_data);
+  void (*on_done_callback)(CURL *easy_curl, CURLcode code, void *on_done_data);
+  char error[CURL_ERROR_SIZE+1];
 };
 
 /** Set on CURLMOPT_SOCKETFUNCTION, adds new fd to epoll, and is associated with multi by fd */
 struct net_socket {
-    curl_socket_t socketfd;
-    CURL *easy_curl;
-    struct net_global *n_global;
-    long timeout;
-    int action;
+  curl_socket_t socketfd;
+  CURL *easy_curl;
+  struct net_global *n_global;
+  long timeout;
+  int action;
 };
 
 int curl_socket_cb(CURL *easy_curl, curl_socket_t s, int what, void *userp, void *socketp);

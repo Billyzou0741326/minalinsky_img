@@ -4,9 +4,9 @@
 #include <stddef.h>
 
 struct string {
-    size_t len;
-    char *cstr;
-    int ref_count;
+  size_t len;
+  char *cstr;
+  int ref_count;
 };
 
 struct string* string_create(void);
